@@ -54,4 +54,77 @@ A modern, secure, and scalable authentication system built with **Spring Boot 3*
 ---
 
 ## 📁 Project Structure
+com.nest.authservice
+├── controller # REST endpoints
+├── service # Business logic
+├── repository # Data access (JPA)
+├── model # Entities & DTOs
+├── security # JWT Filter, JWT Service
+├── config # Security config
+├── exception # Custom exceptions
+└── AuthServiceApplication.java
 
+---
+
+## 🗃️ Database Schema
+
+### Tables
+
+- `users(id, email, password, first_name, last_name, created_at, updated_at)`
+- `roles(id, role_name)`
+- `user_roles(user_id, role_id)`
+- `refresh_tokens(user_id, token, expiry)` *(optional)*
+
+---
+
+## 🔧 Notable Features
+
+- Stateless authentication using JWT
+- Role-based authorization
+- Password hashing with BCrypt
+- Change detection on user update (custom `NoChangesDetectedException`)
+- Custom JWT authentication filter for secure request filtering
+- Clean and modular codebase using DTOs and layered architecture
+- RESTful API endpoints with proper HTTP status codes
+
+---
+
+## 🛡️ Security Config
+
+- `SecurityFilterChain` uses stateless config
+- CSRF disabled for REST APIs
+- JWT filter excludes `/auth/signup` and `/auth/login`
+- Roles injected from DB into `SecurityContext`
+
+---
+
+## ✅ API Endpoints
+
+| Endpoint                  | Method | Description                      | Auth Required |
+|---------------------------|--------|----------------------------------|----------------|
+| `/as/auth/signup`         | POST   | Register new user with roles     | ❌             |
+| `/as/auth/login`          | POST   | Login and receive JWT            | ❌             |
+| `/as/auth/allUsers`       | GET    | Get list of all users            | ✅             |
+| `/as/auth/updateUser`     | PUT    | Update user fields and roles     | ✅             |
+
+---
+
+## 📦 DTOs
+
+- `RequestUserDTO` – For signup and updates (includes role IDs)
+- `ResponseUserDTO` – Minimal user info for client
+- `RequestUpdateUser` – Update input model
+
+---
+
+## 🚨 Exception Handling
+
+- `UserNotFoundException`: Returns 404
+- `NoChangesDetectedException`: Returns 422 with custom JSON payload
+
+```json
+{
+  "status": 422,
+  "path": "/as/auth/updateUser",
+  "message": "No user changes detected"
+}
