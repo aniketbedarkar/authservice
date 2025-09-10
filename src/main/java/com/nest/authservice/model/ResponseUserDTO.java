@@ -12,6 +12,7 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseUserDTO {
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;
