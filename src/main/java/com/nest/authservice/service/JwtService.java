@@ -11,7 +11,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Key;
+import java.security.KeyFactory;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
@@ -20,8 +25,8 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class JwtService {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    @Value("${jwt.private-key-path}")
+    private String privateKeyPath;
 
     @Value("${jwt.expiration}")
     private long jwtExpiration;
@@ -30,7 +35,19 @@ public class JwtService {
 
     @PostConstruct
     public void init(){
-        signinKey = Keys.hmacShaKeyFor(secret.getBytes());
+        try {
+            String key = Files.readString(Paths.get(privateKeyPath))
+                    .replaceAll("-----BEGIN (.*)-----", "")
+                    .replaceAll("-----END (.*)----", "")
+                    .replaceAll("\\s", "");
+
+            byte[] decoded = Base64.getDecoder().decode(key);
+            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            signinKey = kf.generatePrivate(spec);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load RSA private key", e);
+        }
     }
 
     public String generateToken(UserDetails userDetails) {
@@ -43,7 +60,7 @@ public class JwtService {
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(signinKey, SignatureAlgorithm.HS256)
+                .signWith(signinKey, SignatureAlgorithm.RS256)
                 .compact();
     }
     public List<String> extractRoles(String token) {
