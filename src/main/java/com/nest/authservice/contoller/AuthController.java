@@ -28,6 +28,12 @@ public class AuthController {
         return ResponseEntity.ok().body(authService.getAllUsers());
     }
 
+    @GetMapping("/info")
+    public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String header){
+        ResponseUserDTO responseUserDTO = userService.getUser();
+        return ResponseEntity.ok().body(responseUserDTO);
+    }
+
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid RequestSignupUser requestSignupUser){
         Optional<ResponseUserDTO> optionalResponseUserDTO = userService.signUp(requestSignupUser);

@@ -7,6 +7,7 @@ import com.nest.authservice.exception.UserNotFoundException;
 import com.nest.authservice.model.*;
 import com.nest.authservice.repository.RolesRepository;
 import com.nest.authservice.repository.UsersRepository;
+import com.nest.authservice.util.UsersUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -17,9 +18,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.nest.authservice.util.Base64Util.getBase64DecodedPassword;
 
@@ -65,6 +68,12 @@ public class UserService implements UserDetailsService {
     private ResponseUserDTO convertToResponseUserDTO(Users users){
         return modelMapper.map(users, ResponseUserDTO.class);
     }
+
+    public ResponseUserDTO getUser() {
+        Optional<Users> user = UsersUtil.getUserFromAuthentication();
+        return convertToResponseUserDTO(user.orElseThrow(()->new UserNotFoundException("User not found. Authentication required.")));
+    }
+
     public List<ResponseUserDTO> getAllUsers() {
         return usersRepository.findAll().stream()
                 .map(this::convertToResponseUserDTO).toList();
