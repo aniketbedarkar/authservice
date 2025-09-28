@@ -15,8 +15,6 @@ openssl genrsa -out private-key.pem 2048
 
 ### 2. Generate public key from private key
 openssl rsa -in private-key.pem -pubout -out public-key.pem
-=======
----
 
 ## 🧰 Tech Stack
 
