@@ -6,6 +6,7 @@ plugins {
 
 group = 'com.nest'
 version = '0.0.1-SNAPSHOT'
+description = 'Authentication and authorization service for users in nest.'
 
 java {
 	toolchain {
@@ -23,6 +24,11 @@ repositories {
 	mavenCentral()
 }
 
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:2025.0.0" // or latest
+	}
+}
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -32,6 +38,15 @@ dependencies {
 	implementation 'org.liquibase:liquibase-core'
 	implementation 'org.modelmapper:modelmapper:3.2.3'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.1'
+
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	
+	
+	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+	implementation 'io.micrometer:micrometer-tracing'
+	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+
+	
 
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
@@ -45,7 +60,6 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
-
 tasks.named('test') {
 	useJUnitPlatform()
 }
