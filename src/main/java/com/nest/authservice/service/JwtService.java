@@ -36,7 +36,7 @@ public class JwtService {
     @PostConstruct
     public void init(){
         try {
-            String key = Files.readString(Paths.get(privateKeyPath))
+            String key = privateKeyPath
                     .replaceAll("-----BEGIN (.*)-----", "")
                     .replaceAll("-----END (.*)----", "")
                     .replaceAll("\\s", "");
